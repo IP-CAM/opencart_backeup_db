@@ -1,6 +1,7 @@
 <?php
 // Heading
 $_['heading_title']    = 'Копировать базу данных!';
+$_['button_save_sql']    = 'Добавить базу в архив';
 $_['text_save_header'] = "Бекап sql";
 
 // Text

@@ -59,8 +59,29 @@
         <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $text_save_header; ?></h3>
       </div>
       <div class="panel-body">
-        <a href="#" onclick="return false" class="btn btn-success save_sql"> save </a>
-        <div class="file_in"></div>
+        <div class="file_in">
+          <table class="table table-bordered">
+            <thead>
+            <tr>
+              <th>Размер Zip файла</th>
+              <th>Скачать</th>
+              <th>Удалить архив с базами</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="td-in info">
+              <div >
+                <?php if (isset($file_size)){ ?>
+                <td><?php echo $file_size ?></td>
+                <td><a href="<?php echo $file_link ?>">Скачать бекам sql</a></td>
+                <td><a href="<?php echo $action.'&add';?>" class="btn btn-danger">X</a></td>
+                <?php } ?>
+              </div>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <a href="#" onclick="return false" class="btn btn-success save_sql"> <?php echo (isset($button_save_sql)) ?  $button_save_sql : 'Создать базу' ?> </a>
       </div>
     </div>
   </div>
@@ -76,9 +97,10 @@
               method: "POST",
               data : "save_sql='444'"
           }).done(function(smg){
-
-              $('.file_in').html("<a href='http://" +smg + "'>Скачать бекам sql</a>");
-              console.log(smg);
+            var dat = JSON.parse(smg);
+              $(".td-in").html("<td>"+ dat.size +"</td><td><a href='http://" + dat.link + "'>Скачать бекам sql</a></td> <td><a href='#' class='btn btn-danger'>X</a></td>");
+              $('.save_sql').text('Добавить базу в архив');
+              console.log(JSON.parse(smg));
                   });
       });
   })

@@ -1,9 +1,9 @@
 <?php
 class ControllerExtensionModuleBackupSql extends Controller {
 	private $error = array();
-	public $fileName = 'mysqlbackup-.sql';
 	const BACKUP_DIR = './myBackups';
 	public function index() {
+		$fileName = 'mysqlbackup-'. date('d-m-Y') . '@'.date('h.i.s').'.sql';
 		$this->load->language('extension/module/backup_sql');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -31,12 +31,24 @@ class ControllerExtensionModuleBackupSql extends Controller {
 			$zip = new ZipArchive();
 			$resOpen = $zip->open(self::BACKUP_DIR . '/' . "back.zip", ZIPARCHIVE::CREATE);
 			if ($resOpen) {
-				$zip->addFromString($this->fileName, "$return");
+				$zip->addFromString($fileName, "$return");
 			}
 			$zip->close();
 
-			echo $this->request->server['DOCUMENT_ROOT'].'admin/myBackups/back.zip' ;
+			$arr = [
+				'link' => $this->request->server['SERVER_NAME'].'/admin/myBackups/back.zip',
+				'size' => $this->get_file_size_unit(filesize(self::BACKUP_DIR . '/' . "back.zip"))
+			];
+
+			echo json_encode($arr);
 			die();
+		}
+
+		if (file_exists( DIR_APPLICATION.'myBackups/back.zip'))
+		{
+			$data['file_link'] = '/admin/myBackups/back.zip';
+			$data['file_size'] = $this->get_file_size_unit(filesize(self::BACKUP_DIR . '/' . "back.zip"));
+			$data['button_save_sql'] = $this->language->get('button_save_sql');
 		}
 
 		$data['text_save_header'] = $this->language->get('text_save_header');
@@ -99,6 +111,19 @@ class ControllerExtensionModuleBackupSql extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('extension/module/backup_sql', $data));
+	}
+
+	protected  function get_file_size_unit($file_size){
+		switch (true) {
+			case ($file_size/1024 < 1) :
+				return intval($file_size ) ." Bytes" ;
+				break;
+			case ($file_size/1024 >= 1 && $file_size/(1024*1024) < 1)  :
+				return intval($file_size/1024) ." KB" ;
+				break;
+			default:
+				return intval($file_size/(1024*1024)) ." MB" ;
+		}
 	}
 
 	protected function validate() {
